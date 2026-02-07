@@ -1892,13 +1892,15 @@
         });
 
         // Challenge cards click - Open modal
-        document.querySelectorAll('.challenge-card').forEach(card => {
-            card.addEventListener('click', function() {
-                if (hasEnrolledThisSession) return;
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.challenge-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    if (hasEnrolledThisSession) return;
 
-                const challenge = this.getAttribute('data-challenge');
-                modalTitle.textContent = challenge;
-                challengeModal.style.display = 'flex';
+                    const challenge = this.getAttribute('data-challenge');
+                    modalTitle.textContent = challenge;
+                    challengeModal.style.display = 'flex';
+                });
             });
         });
 
