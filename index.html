@@ -1780,11 +1780,27 @@
         // Initialize database when page loads
         window.addEventListener('load', () => {
             setTimeout(() => {
-                if (window.supabase) {
-                    database = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                    console.log('✅ Database connected');
+                try {
+                    if (window.supabase) {
+                        database = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        console.log('✅ Database connected successfully');
+
+                        // Test the connection
+                        database.from('enrollments').select('count').then(({count, error}) => {
+                            if (error) {
+                                console.error('❌ Database test failed:', error.message);
+                                console.log('💡 Tip: Make sure RLS is disabled or policies allow inserts');
+                            } else {
+                                console.log('✅ Database table accessible');
+                            }
+                        });
+                    } else {
+                        console.error('❌ Supabase library not loaded');
+                    }
+                } catch (error) {
+                    console.error('❌ Database initialization error:', error);
                 }
-            }, 100);
+            }, 500);
         });
 
         // Progress Bar
@@ -1932,6 +1948,7 @@
             // Save to database
             if (database) {
                 try {
+                    console.log('💾 Saving to database...');
                     const { data, error } = await database
                         .from('enrollments')
                         .insert([
@@ -1939,13 +1956,19 @@
                         ]);
 
                     if (error) {
-                        console.error('❌ Database error:', error);
+                        console.error('❌ Database error:', error.message);
+                        console.error('Full error details:', error);
+                        alert('Could not save enrollment. Please try again.');
                     } else {
-                        console.log('✅ Saved to database:', data);
+                        console.log('✅ Saved to database successfully!');
+                        console.log('Saved data:', data);
                     }
                 } catch (err) {
-                    console.error('❌ Exception:', err);
+                    console.error('❌ Exception during save:', err);
+                    alert('Error saving enrollment. Please try again.');
                 }
+            } else {
+                console.warn('⚠️ Database not connected - enrollment not saved');
             }
 
             // Hide form, show success
@@ -1979,6 +2002,7 @@
             // Save to database
             if (database) {
                 try {
+                    console.log('💾 Saving to database...');
                     const { data, error } = await database
                         .from('enrollments')
                         .insert([
@@ -1986,13 +2010,17 @@
                         ]);
 
                     if (error) {
-                        console.error('❌ Database error:', error);
+                        console.error('❌ Database error:', error.message);
+                        console.error('Full error details:', error);
                     } else {
-                        console.log('✅ Saved to database:', data);
+                        console.log('✅ Saved to database successfully!');
+                        console.log('Saved data:', data);
                     }
                 } catch (err) {
-                    console.error('❌ Exception:', err);
+                    console.error('❌ Exception during save:', err);
                 }
+            } else {
+                console.warn('⚠️ Database not connected - enrollment not saved');
             }
 
             button.textContent = '✓ Enrolled Successfully!';
