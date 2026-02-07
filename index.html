@@ -435,6 +435,7 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            pointer-events: auto !important;
         }
 
         .challenge-card::before {
@@ -446,6 +447,7 @@
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             transition: left 0.5s;
+            pointer-events: none;
         }
 
         .challenge-card:hover::before {
@@ -1445,7 +1447,7 @@
             <p class="section-subtitle">Click any challenge to enroll. Start building real skills today!</p>
         </div>
         <div class="challenges-grid">
-            <div class="challenge-card reveal" data-challenge="Excel Mastery">
+            <div class="challenge-card reveal" data-challenge="Excel Mastery" onclick="openEnrollModal('Excel Mastery')">
                 <div class="challenge-icon">📊</div>
                 <h3 class="challenge-title">Excel Mastery</h3>
                 <p class="challenge-desc">From basics to advanced formulas. Master spreadsheets through real business scenarios.</p>
@@ -1454,7 +1456,7 @@
                     <span class="meta-item">⚡ All Levels</span>
                 </div>
             </div>
-            <div class="challenge-card reveal" data-challenge="AI Prompting">
+            <div class="challenge-card reveal" data-challenge="AI Prompting" onclick="openEnrollModal('AI Prompting')">
                 <div class="challenge-icon">🤖</div>
                 <h3 class="challenge-title">AI Prompting</h3>
                 <p class="challenge-desc">Learn to communicate effectively with AI. Write better prompts, get better results.</p>
@@ -1463,7 +1465,7 @@
                     <span class="meta-item">⚡ Beginner</span>
                 </div>
             </div>
-            <div class="challenge-card reveal" data-challenge="Power BI Pro">
+            <div class="challenge-card reveal" data-challenge="Power BI Pro" onclick="openEnrollModal('Power BI Pro')">
                 <div class="challenge-icon">📈</div>
                 <h3 class="challenge-title">Power BI Pro</h3>
                 <p class="challenge-desc">Transform data into stunning dashboards. From basics to DAX and advanced analytics.</p>
@@ -1472,7 +1474,7 @@
                     <span class="meta-item">🔥 Intermediate</span>
                 </div>
             </div>
-            <div class="challenge-card reveal" data-challenge="Figma Design">
+            <div class="challenge-card reveal" data-challenge="Figma Design" onclick="openEnrollModal('Figma Design')">
                 <div class="challenge-icon">🎨</div>
                 <h3 class="challenge-title">Figma Design</h3>
                 <p class="challenge-desc">Design beautiful interfaces. Learn UI/UX fundamentals through daily design tasks.</p>
@@ -1481,7 +1483,7 @@
                     <span class="meta-item">⚡ Beginner</span>
                 </div>
             </div>
-            <div class="challenge-card reveal" data-challenge="Python Basics">
+            <div class="challenge-card reveal" data-challenge="Python Basics" onclick="openEnrollModal('Python Basics')">
                 <div class="challenge-icon">💻</div>
                 <h3 class="challenge-title">Python Basics</h3>
                 <p class="challenge-desc">Start coding with Python. Build real scripts and automate daily tasks.</p>
@@ -1490,7 +1492,7 @@
                     <span class="meta-item">⚡ Beginner</span>
                 </div>
             </div>
-            <div class="challenge-card reveal" data-challenge="No-Code Apps">
+            <div class="challenge-card reveal" data-challenge="No-Code Apps" onclick="openEnrollModal('No-Code Apps')">
                 <div class="challenge-icon">📱</div>
                 <h3 class="challenge-title">No-Code Apps</h3>
                 <p class="challenge-desc">Build apps without coding. Use tools like Bubble, Airtable, and Zapier.</p>
@@ -1763,36 +1765,10 @@
         </div>
     </footer>
 
-    <!-- Supabase SDK (loads after page) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://jzqwqlqjawcbwtdnqcuq.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cXdxbHFqYXdjYnd0ZG5xY3VxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NzA2MzgsImV4cCI6MjA4NjA0NjYzOH0.63GOmzzPhd7b5lQX0FYmn6DmGTDhzQklNq2QsmdSFhY';
+        console.log('🚀 Script loaded - Challenge cards should work now!');
 
-        // Initialize Supabase
-        let supabase = null;
-
-        function initSupabase() {
-            try {
-                if (typeof window.supabase !== 'undefined') {
-                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                    console.log('✅ Supabase connected successfully');
-                } else {
-                    console.warn('⚠️ Supabase library not loaded');
-                }
-            } catch (error) {
-                console.error('❌ Supabase error:', error);
-            }
-        }
-
-        // Initialize when page loads
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                initSupabase();
-            }, 500);
-        });
+        // NO DATABASE - Testing modal functionality first
 
         // Progress Bar
         window.addEventListener('scroll', () => {
@@ -1869,9 +1845,28 @@
         const modalSuccess = document.getElementById('modal-success');
         let hasEnrolledThisSession = false;
 
+        // Open modal function (for onclick handlers)
+        window.openEnrollModal = function(challengeName) {
+            console.log('openEnrollModal called with:', challengeName);
+            if (hasEnrolledThisSession) return;
+
+            const modal = document.getElementById('challenge-modal');
+            const title = document.getElementById('modal-title');
+
+            if (!modal || !title) {
+                console.error('Modal elements not found');
+                return;
+            }
+
+            title.textContent = challengeName;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
         // Close modal function
         function closeChallengeModal() {
             challengeModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
         // Close button
@@ -1891,20 +1886,22 @@
             }
         });
 
-        // Challenge cards click - Open modal
-        window.addEventListener('load', () => {
-            document.querySelectorAll('.challenge-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    if (hasEnrolledThisSession) return;
-
-                    const challenge = this.getAttribute('data-challenge');
-                    modalTitle.textContent = challenge;
-                    challengeModal.style.display = 'flex';
-                });
-            });
+        // Event delegation for challenge cards (more reliable)
+        console.log('📝 Setting up click listeners for challenge cards...');
+        document.addEventListener('click', function(e) {
+            console.log('Click detected on:', e.target.className, e.target.tagName);
+            const card = e.target.closest('.challenge-card');
+            if (card) {
+                console.log('✓ Challenge card found!');
+                e.preventDefault();
+                e.stopPropagation();
+                const challenge = card.getAttribute('data-challenge');
+                console.log('📌 Opening modal for:', challenge);
+                window.openEnrollModal(challenge);
+            }
         });
 
-        // Modal form submit - Save to Supabase
+        // Modal form submit - Save enrollment
         modalForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             if (hasEnrolledThisSession) return;
@@ -1913,27 +1910,8 @@
             const email = this.querySelector('input').value;
             const challenge = modalTitle.textContent;
 
-            // Save to Supabase
-            if (supabase) {
-                try {
-                    const { data, error } = await supabase
-                        .from('enrollments')
-                        .insert([
-                            { email: email, challenge: challenge }
-                        ]);
-
-                    if (error) {
-                        console.error('❌ Supabase error:', error);
-                        alert('Error saving enrollment. Please try again.');
-                    } else {
-                        console.log('✅ Enrollment saved to Supabase:', data);
-                    }
-                } catch (err) {
-                    console.error('❌ Exception:', err);
-                }
-            } else {
-                console.warn('⚠️ Supabase not connected');
-            }
+            console.log('📧 Enrollment:', email, 'for', challenge);
+            // TODO: Save to database later
 
             // Hide form, show success
             this.style.display = 'none';
@@ -1952,7 +1930,7 @@
             }, 2500);
         });
 
-        // Quick Enroll form submission - Save to Supabase
+        // Quick Enroll form submission
         document.getElementById('quick-enroll-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -1961,24 +1939,8 @@
             const button = this.querySelector('button');
             const originalText = button.textContent;
 
-            // Save to Supabase
-            if (supabase) {
-                try {
-                    const { data, error } = await supabase
-                        .from('enrollments')
-                        .insert([
-                            { email: email, challenge: course }
-                        ]);
-
-                    if (error) {
-                        console.error('❌ Supabase error:', error);
-                    } else {
-                        console.log('✅ Enrollment saved to Supabase:', data);
-                    }
-                } catch (err) {
-                    console.error('❌ Exception:', err);
-                }
-            }
+            console.log('📧 Quick Enrollment:', email, 'for', course);
+            // TODO: Save to database later
 
             button.textContent = '✓ Enrolled Successfully!';
             button.style.background = '#10B981';
