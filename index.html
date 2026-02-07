@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -1764,6 +1765,33 @@
     </footer>
 
     <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://jzqwqlqjawcbwtdnqcuq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cXdxbHFqYXdjYnd0ZG5xY3VxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NzA2MzgsImV4cCI6MjA4NjA0NjYzOH0.63GOmzzPhd7b5lQX0FYmn6DmGTDhzQklNq2QsmdSFhY';
+
+        // Initialize Supabase
+        let supabase = null;
+
+        function initSupabase() {
+            try {
+                if (typeof window.supabase !== 'undefined') {
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    console.log('✅ Supabase connected successfully');
+                } else {
+                    console.warn('⚠️ Supabase library not loaded');
+                }
+            } catch (error) {
+                console.error('❌ Supabase error:', error);
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                initSupabase();
+            }, 500);
+        });
+
         // Progress Bar
         window.addEventListener('scroll', () => {
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
@@ -1872,13 +1900,36 @@
             });
         });
 
-        // Modal form submit - Simple version
-        modalForm.addEventListener('submit', function(e) {
+        // Modal form submit - Save to Supabase
+        modalForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             if (hasEnrolledThisSession) return;
 
             hasEnrolledThisSession = true;
             const email = this.querySelector('input').value;
+            const challenge = modalTitle.textContent;
+
+            // Save to Supabase
+            if (supabase) {
+                try {
+                    const { data, error } = await supabase
+                        .from('enrollments')
+                        .insert([
+                            { email: email, challenge: challenge }
+                        ]);
+
+                    if (error) {
+                        console.error('❌ Supabase error:', error);
+                        alert('Error saving enrollment. Please try again.');
+                    } else {
+                        console.log('✅ Enrollment saved to Supabase:', data);
+                    }
+                } catch (err) {
+                    console.error('❌ Exception:', err);
+                }
+            } else {
+                console.warn('⚠️ Supabase not connected');
+            }
 
             // Hide form, show success
             this.style.display = 'none';
@@ -1897,19 +1948,42 @@
             }, 2500);
         });
 
-        // Quick Enroll form submission - Simple version
-        document.getElementById('quick-enroll-form').addEventListener('submit', function(e) {
+        // Quick Enroll form submission - Save to Supabase
+        document.getElementById('quick-enroll-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
+            const email = this.querySelector('input[type="email"]').value;
+            const course = this.querySelector('select').value;
             const button = this.querySelector('button');
             const originalText = button.textContent;
 
+            // Save to Supabase
+            if (supabase) {
+                try {
+                    const { data, error } = await supabase
+                        .from('enrollments')
+                        .insert([
+                            { email: email, challenge: course }
+                        ]);
+
+                    if (error) {
+                        console.error('❌ Supabase error:', error);
+                    } else {
+                        console.log('✅ Enrollment saved to Supabase:', data);
+                    }
+                } catch (err) {
+                    console.error('❌ Exception:', err);
+                }
+            }
+
             button.textContent = '✓ Enrolled Successfully!';
             button.style.background = '#10B981';
+            button.disabled = true;
 
             setTimeout(() => {
                 button.textContent = originalText;
                 button.style.background = '';
+                button.disabled = false;
                 this.reset();
             }, 3000);
         });
